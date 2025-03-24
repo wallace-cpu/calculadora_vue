@@ -1,53 +1,40 @@
 <template>
   <div class="calculator">
-    <div class="display">{{ current || '0' }}</div>
-    <div class="buttons">
-      <button @click="clear">C</button>
-      <button @click="append('/')">/</button>
-      <button @click="append('*')">*</button>
-      <button @click="backspace">⌫</button>
-
-      <button v-for="n in 9" :key="n" @click="append(n.toString())">{{ n }}</button>
-
-      <button @click="append('-')">-</button>
-      <button @click="append('0')">0</button>
-      <button @click="append('.')">.</button>
-      <button @click="append('+')">+</button>
-      
-      <button class="equal" @click="calculate">=</button>
+    <div class="inputs">
+      <input type="number" v-model.number="num1" placeholder="Número 1" />
+      <select v-model="operation">
+        <option value="+">+</option>
+        <option value="-">-</option>
+        <option value="*">*</option>
+        <option value="/">/</option>
+      </select>
+      <input type="number" v-model.number="num2" placeholder="Número 2" />
     </div>
+    <div class="result">Resultado: {{ result }}</div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
-const current = ref('');
+const num1 = ref(0);
+const num2 = ref(0);
+const operation = ref('+');
 
-const append = (value) => {
-  current.value += value;
-};
-
-const clear = () => {
-  current.value = '';
-};
-
-const backspace = () => {
-  current.value = current.value.slice(0, -1);
-};
-
-const calculate = () => {
-  try {
-    current.value = eval(current.value).toString();
-  } catch {
-    current.value = 'Erro';
+const result = computed(() => {
+  switch (operation.value) {
+    case '+': return num1.value + num2.value;
+    case '-': return num1.value - num2.value;
+    case '*': return num1.value * num2.value;
+    case '/': return num2.value !== 0 ? num1.value / num2.value : 'Erro';
+    default: return 'Erro';
   }
-};
+});
 </script>
 
 <style scoped>
 .calculator {
-  width: 220px;
+  width: 250px;
   margin: 20px auto;
   padding: 10px;
   background: #222;
@@ -56,36 +43,24 @@ const calculate = () => {
   border-radius: 10px;
 }
 
-.display {
-  font-size: 1.8em;
-  padding: 10px;
-  background: #444;
-  margin-bottom: 10px;
-  border-radius: 5px;
-}
-
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.inputs {
+  display: flex;
+  justify-content: center;
   gap: 5px;
+  margin-bottom: 10px;
 }
 
-button {
-  padding: 15px;
-  font-size: 1.2em;
+input, select {
+  padding: 8px;
+  font-size: 1em;
   border: none;
-  cursor: pointer;
-  background: #666;
-  color: white;
   border-radius: 5px;
 }
 
-button:active {
-  background: #888;
-}
-
-.equal {
-  grid-column: span 4;
-  background: #ff9800;
+.result {
+  font-size: 1.5em;
+  background: #444;
+  padding: 10px;
+  border-radius: 5px;
 }
 </style>
